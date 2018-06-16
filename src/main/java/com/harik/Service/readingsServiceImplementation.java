@@ -9,6 +9,8 @@ import com.harik.Entity.Tires;
 import com.harik.Entity.Vehicle;
 import com.harik.Entity.alerts;
 import com.harik.Exception.vehicleNotFoundException;
+import com.harik.Message.EmailAwsSESImplementation;
+import com.harik.Message.smsAwsSNSImplementation;
 import com.harik.Repository.alertsRepository;
 import com.harik.Repository.readingsRepository;
 import com.harik.Repository.tireRepository;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import static org.easyrules.core.RulesEngineBuilder.aNewRulesEngine;
@@ -37,10 +40,17 @@ public class readingsServiceImplementation implements readingsService
     @Autowired
     tireRepository tireRepo;
 
+    //
+    @Autowired
+    EmailAwsSESImplementation email;
+
+    @Autowired
+    smsAwsSNSImplementation sms;
+
+    //
     @Override
     @Transactional
-    public Readings saveOrUpdateReadings(Readings readings)
-    {
+    public Readings saveOrUpdateReadings(Readings readings) throws IOException {
         readRepo.save(readings);
         Optional<Vehicle> v=vehRepo.findById(readings.getVin());
         Optional<Tires> tire = Optional.ofNullable(readings.getTires());
@@ -72,6 +82,7 @@ public class readingsServiceImplementation implements readingsService
             alerts.setType("Fuel Volume");
             alerts.setPriority("MEDIUM");
             alertRepo.save(alerts);
+
         }
         if(rpmAlert.isResult())
         {
@@ -80,6 +91,19 @@ public class readingsServiceImplementation implements readingsService
             alerts.setType("Red Line RPM");
             alerts.setPriority("HIGH");
             alertRepo.save(alerts);
+            //
+            //Set from and to email id
+            email.setFrom(" ");
+            email.setTo(" ");
+            email.setBody("Your vehicle "+v.get().getModel()+", vin:"+readings.getVin()+"has current engine RPM > redLineRPM");
+            email.setSubject("High Priority alert ");
+            email.sendAlert();
+
+            //Set phone Number
+            sms.setMessage("vehicle's engine RPM > redLineRPM ");
+            sms.setPhoneNumber(" ");
+            sms.sendAlert();
+            //
         }
         if(coolantLights.isResult())
         {
