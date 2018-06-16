@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping(value = "/readings")
 @Api(description = "Readings related End Points")
@@ -28,7 +30,7 @@ public class readingsController
             @ApiResponse(code=500,message = "Server Not Found")
     })
     @CrossOrigin(origins = "http://mocker.egen.io")
-    public Readings saveAllReadings(@RequestBody Readings readings)
+    public Readings saveAllReadings(@RequestBody Readings readings) throws IOException
     {
         return  readserv.saveOrUpdateReadings(readings);
     }

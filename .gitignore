@@ -1,3 +1,5 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Maven template
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -7,6 +9,10 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-
+*.class
+ *.settings
+ *.metadata
+ *.idea
 # Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
 !/.mvn/wrapper/maven-wrapper.jar
+
